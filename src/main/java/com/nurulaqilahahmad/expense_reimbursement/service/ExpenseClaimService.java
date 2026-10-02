@@ -1,6 +1,7 @@
 package com.nurulaqilahahmad.expense_reimbursement.service;
 
 import com.nurulaqilahahmad.expense_reimbursement.dto.request.CreateExpenseClaimRequest;
+import com.nurulaqilahahmad.expense_reimbursement.dto.request.UpdateExpenseClaimRequest;
 import com.nurulaqilahahmad.expense_reimbursement.dto.response.ExpenseClaimResponse;
 import com.nurulaqilahahmad.expense_reimbursement.entity.ExpenseItem;
 import com.nurulaqilahahmad.expense_reimbursement.exception.ExpenseClaimNotFoundException;
@@ -55,13 +56,15 @@ public class ExpenseClaimService {
         return ExpenseClaimMapper.toResponse(claim);
     }
 
-    public ExpenseClaim updateClaim(UUID id, ExpenseClaim updatedClaim) {
+    public ExpenseClaimResponse updateClaim(UUID id, UpdateExpenseClaimRequest request) {
         ExpenseClaim existingClaim = findClaimById(id);
 
-        existingClaim.setTitle(updatedClaim.getTitle());
-        existingClaim.setDescription(updatedClaim.getDescription());
+        existingClaim.setTitle(request.getTitle());
+        existingClaim.setDescription(request.getDescription());
 
-        return expenseClaimRepository.save(existingClaim);
+        ExpenseClaim savedExistingClaim = expenseClaimRepository.save(existingClaim);
+
+        return ExpenseClaimMapper.toResponse(savedExistingClaim);
     }
 
     public void deleteClaim(UUID id) {
