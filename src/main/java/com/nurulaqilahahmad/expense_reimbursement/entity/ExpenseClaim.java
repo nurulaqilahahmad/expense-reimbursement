@@ -1,6 +1,8 @@
 package com.nurulaqilahahmad.expense_reimbursement.entity;
 
 import jakarta.persistence.*;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -11,6 +13,8 @@ import java.util.UUID;
 
 @Entity
 @Table(name = "expense_claim")
+@Getter
+@Setter
 public class ExpenseClaim {
 
     @Id
