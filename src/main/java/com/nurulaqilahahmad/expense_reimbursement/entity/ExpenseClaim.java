@@ -1,6 +1,11 @@
 package com.nurulaqilahahmad.expense_reimbursement.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -25,6 +30,7 @@ public class ExpenseClaim {
     private String title;
 
     @Column(length = 1000)
+    @NotBlank
     private String description;
 
     private LocalDate submissionDate;
@@ -34,6 +40,8 @@ public class ExpenseClaim {
     private EnumExpenseClaimStatus status = EnumExpenseClaimStatus.DRAFT;
 
     @Column(nullable = false, precision = 12, scale = 2)
+    @NotNull
+    @DecimalMin(value = "0.01")
     private BigDecimal totalAmount = BigDecimal.ZERO;
 
     @Column(nullable = false)
@@ -46,6 +54,8 @@ public class ExpenseClaim {
             cascade = CascadeType.ALL,
             orphanRemoval = true
     )
+    @NotEmpty
+    @Valid
     private List<ExpenseItem> items = new ArrayList<>();
 
     @PrePersist
