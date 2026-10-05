@@ -43,6 +43,11 @@ public class ExpenseClaimController {
         return ResponseEntity.ok(expenseClaimService.updateClaim(id, request));
     }
 
+    @PostMapping("/{id}/submit")
+    public ResponseEntity<ExpenseClaimResponse> submitClaim(@PathVariable UUID id) {
+        return ResponseEntity.ok(expenseClaimService.submitClaim(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClaim(@PathVariable UUID id) {
         expenseClaimService.deleteClaim(id);
