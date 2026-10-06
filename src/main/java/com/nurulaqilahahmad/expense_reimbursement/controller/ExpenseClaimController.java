@@ -48,6 +48,21 @@ public class ExpenseClaimController {
         return ResponseEntity.ok(expenseClaimService.submitClaim(id));
     }
 
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<ExpenseClaimResponse> approveClaim(@PathVariable UUID id) {
+        return ResponseEntity.ok(expenseClaimService.approveClaim(id));
+    }
+
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<ExpenseClaimResponse> rejectClaim(@PathVariable UUID id) {
+        return ResponseEntity.ok(expenseClaimService.rejectClaim(id));
+    }
+
+    @PostMapping("/{id}/pay")
+    public ResponseEntity<ExpenseClaimResponse> markClaimAsPaid(@PathVariable UUID id) {
+        return ResponseEntity.ok(expenseClaimService.markClaimAsPaid(id));
+    }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClaim(@PathVariable UUID id) {
         expenseClaimService.deleteClaim(id);
