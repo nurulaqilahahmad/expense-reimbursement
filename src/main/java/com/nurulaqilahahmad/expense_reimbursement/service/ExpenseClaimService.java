@@ -94,9 +94,54 @@ public class ExpenseClaimService {
         return ExpenseClaimMapper.toResponse(savedClaim);
     }
 
+    public ExpenseClaimResponse approveClaim(UUID id) {
+
+        ExpenseClaim claim = findClaimById(id);
+
+        if (claim.getStatus() != EnumExpenseClaimStatus.SUBMITTED) {
+            throw new InvalidExpenseClaimStateException("Only SUBMITTED claims can be approved");
+        }
+
+        claim.setStatus(EnumExpenseClaimStatus.APPROVED);
+
+        ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
+
+        return ExpenseClaimMapper.toResponse(savedClaim);
+    }
+
+    public ExpenseClaimResponse rejectClaim(UUID id) {
+
+        ExpenseClaim claim = findClaimById(id);
+
+        if (claim.getStatus() != EnumExpenseClaimStatus.SUBMITTED) {
+            throw new InvalidExpenseClaimStateException("Only SUBMITTED claims can be rejected");
+        }
+
+        claim.setStatus(EnumExpenseClaimStatus.REJECTED);
+
+        ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
+
+        return ExpenseClaimMapper.toResponse(savedClaim);
+    }
+
+    public ExpenseClaimResponse markClaimAsPaid(UUID id) {
+
+        ExpenseClaim claim = findClaimById(id);
+
+        if (claim.getStatus() != EnumExpenseClaimStatus.APPROVED) {
+            throw new InvalidExpenseClaimStateException("Only APPROVED claims can be marked as paid");
+        }
+
+        claim.setStatus(EnumExpenseClaimStatus.PAID);
+
+        ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
+
+        return ExpenseClaimMapper.toResponse(savedClaim);
+    }
+
     public void deleteClaim(UUID id) {
         ExpenseClaim claim = findClaimById(id);
-        // not expenseClaimRepository.deleteById(id); bcs to control what happens if the claim doesn't exist
+        // not expenseClaimRepository.deleteById(id); bcs to control what happens if the claim doesn't exist or draft
         if (claim.getStatus() != EnumExpenseClaimStatus.DRAFT) {
             throw new InvalidExpenseClaimStateException("Only DRAFT claims can be deleted");
         }
