@@ -58,6 +58,10 @@ public class ExpenseClaim {
     @Valid
     private List<ExpenseItem> items = new ArrayList<>();
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "employee_id")
+    private AppUser employee;
+
     @Column(name = "rejection_reason", length = 1000)
     private String rejectionReason;
 
