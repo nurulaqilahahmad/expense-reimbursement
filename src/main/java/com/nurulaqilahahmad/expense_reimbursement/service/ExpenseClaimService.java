@@ -1,6 +1,7 @@
 package com.nurulaqilahahmad.expense_reimbursement.service;
 
 import com.nurulaqilahahmad.expense_reimbursement.dto.request.CreateExpenseClaimRequest;
+import com.nurulaqilahahmad.expense_reimbursement.dto.request.RejectExpenseClaimRequest;
 import com.nurulaqilahahmad.expense_reimbursement.dto.request.UpdateExpenseClaimRequest;
 import com.nurulaqilahahmad.expense_reimbursement.dto.response.ExpenseClaimResponse;
 import com.nurulaqilahahmad.expense_reimbursement.entity.EnumExpenseClaimStatus;
@@ -13,7 +14,7 @@ import com.nurulaqilahahmad.expense_reimbursement.repository.ExpenseClaimReposit
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -87,7 +88,7 @@ public class ExpenseClaimService {
         }
 
         claim.setStatus(EnumExpenseClaimStatus.SUBMITTED);
-        claim.setSubmissionDate(LocalDate.now());
+        claim.setSubmissionDate(LocalDateTime.now());
 
         ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
 
@@ -103,13 +104,14 @@ public class ExpenseClaimService {
         }
 
         claim.setStatus(EnumExpenseClaimStatus.APPROVED);
+        claim.setApprovedAt(LocalDateTime.now());
 
         ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
 
         return ExpenseClaimMapper.toResponse(savedClaim);
     }
 
-    public ExpenseClaimResponse rejectClaim(UUID id) {
+    public ExpenseClaimResponse rejectClaim(UUID id, RejectExpenseClaimRequest request) {
 
         ExpenseClaim claim = findClaimById(id);
 
@@ -118,6 +120,25 @@ public class ExpenseClaimService {
         }
 
         claim.setStatus(EnumExpenseClaimStatus.REJECTED);
+        claim.setRejectionReason(request.getReason());
+        claim.setRejectedAt(LocalDateTime.now());
+
+        ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
+
+        return ExpenseClaimMapper.toResponse(savedClaim);
+    }
+
+    public ExpenseClaimResponse reviseClaim(UUID id) {
+
+        ExpenseClaim claim = findClaimById(id);
+
+        if (claim.getStatus() != EnumExpenseClaimStatus.REJECTED) {
+            throw new InvalidExpenseClaimStateException("Only REJECTED claims can be revised");
+        }
+
+        claim.setStatus(EnumExpenseClaimStatus.DRAFT);
+        claim.setRejectionReason(null);
+        claim.setRejectedAt(null);
 
         ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
 
@@ -133,6 +154,7 @@ public class ExpenseClaimService {
         }
 
         claim.setStatus(EnumExpenseClaimStatus.PAID);
+        claim.setPaidAt(LocalDateTime.now());
 
         ExpenseClaim savedClaim = expenseClaimRepository.save(claim);
 

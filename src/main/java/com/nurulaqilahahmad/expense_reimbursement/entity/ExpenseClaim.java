@@ -10,7 +10,6 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,7 +32,8 @@ public class ExpenseClaim {
     @NotBlank
     private String description;
 
-    private LocalDate submissionDate;
+    @Column(name = "submission_date")
+    private LocalDateTime submissionDate;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -57,6 +57,18 @@ public class ExpenseClaim {
     @NotEmpty
     @Valid
     private List<ExpenseItem> items = new ArrayList<>();
+
+    @Column(name = "rejection_reason", length = 1000)
+    private String rejectionReason;
+
+    @Column(name = "rejected_at")
+    private LocalDateTime rejectedAt;
+
+    @Column(name = "approved_at")
+    private LocalDateTime approvedAt;
+
+    @Column(name = "paid_at")
+    private LocalDateTime paidAt;
 
     @PrePersist
     public void onCreate() {
