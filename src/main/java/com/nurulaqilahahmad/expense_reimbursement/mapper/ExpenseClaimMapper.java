@@ -56,6 +56,10 @@ public class ExpenseClaimMapper {
         response.setTotalAmount(claim.getTotalAmount());
         response.setCreatedAt(claim.getCreatedAt());
         response.setUpdatedAt(claim.getUpdatedAt());
+        response.setApprovedAt(claim.getApprovedAt());
+        response.setRejectedAt(claim.getRejectedAt());
+        response.setRejectionReason(claim.getRejectionReason());
+        response.setPaidAt(claim.getPaidAt());
 
         List<ExpenseItemResponse> items = claim.getItems()
                 .stream()

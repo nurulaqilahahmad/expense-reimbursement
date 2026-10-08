@@ -1,6 +1,7 @@
 package com.nurulaqilahahmad.expense_reimbursement.controller;
 
 import com.nurulaqilahahmad.expense_reimbursement.dto.request.CreateExpenseClaimRequest;
+import com.nurulaqilahahmad.expense_reimbursement.dto.request.RejectExpenseClaimRequest;
 import com.nurulaqilahahmad.expense_reimbursement.dto.request.UpdateExpenseClaimRequest;
 import com.nurulaqilahahmad.expense_reimbursement.dto.response.ExpenseClaimResponse;
 import com.nurulaqilahahmad.expense_reimbursement.service.ExpenseClaimService;
@@ -24,7 +25,7 @@ public class ExpenseClaimController {
 
     @PostMapping
     public ResponseEntity<ExpenseClaimResponse> createClaim(@Valid @RequestBody CreateExpenseClaimRequest request) {
-        ExpenseClaimResponse response =expenseClaimService.createClaim(request);
+        ExpenseClaimResponse response = expenseClaimService.createClaim(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -54,8 +55,13 @@ public class ExpenseClaimController {
     }
 
     @PostMapping("/{id}/reject")
-    public ResponseEntity<ExpenseClaimResponse> rejectClaim(@PathVariable UUID id) {
-        return ResponseEntity.ok(expenseClaimService.rejectClaim(id));
+    public ResponseEntity<ExpenseClaimResponse> rejectClaim(@PathVariable UUID id, @Valid @RequestBody RejectExpenseClaimRequest request) {
+        return ResponseEntity.ok(expenseClaimService.rejectClaim(id, request));
+    }
+
+    @PostMapping("/{id}/revise")
+    public ResponseEntity<ExpenseClaimResponse> reviseClaim(@PathVariable UUID id) {
+        return ResponseEntity.ok(expenseClaimService.reviseClaim(id));
     }
 
     @PostMapping("/{id}/pay")
