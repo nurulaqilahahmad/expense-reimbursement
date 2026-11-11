@@ -8,6 +8,9 @@ import com.nurulaqilahahmad.expense_reimbursement.service.ExpenseClaimService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -23,12 +26,6 @@ public class ExpenseClaimController {
         this.expenseClaimService = expenseClaimService;
     }
 
-    @PostMapping
-    public ResponseEntity<ExpenseClaimResponse> createClaim(@Valid @RequestBody CreateExpenseClaimRequest request) {
-        ExpenseClaimResponse response = expenseClaimService.createClaim(request);
-        return ResponseEntity.status(HttpStatus.CREATED).body(response);
-    }
-
     @GetMapping
     public ResponseEntity<List<ExpenseClaimResponse>> getAllClaims() {
         return ResponseEntity.ok(expenseClaimService.getAllClaims());
@@ -40,38 +37,86 @@ public class ExpenseClaimController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ExpenseClaimResponse> updateClaim(@PathVariable UUID id, @Valid @RequestBody UpdateExpenseClaimRequest request) {
-        return ResponseEntity.ok(expenseClaimService.updateClaim(id, request));
-    }
-
-    @PostMapping("/{id}/submit")
-    public ResponseEntity<ExpenseClaimResponse> submitClaim(@PathVariable UUID id) {
-        return ResponseEntity.ok(expenseClaimService.submitClaim(id));
-    }
-
-    @PostMapping("/{id}/approve")
-    public ResponseEntity<ExpenseClaimResponse> approveClaim(@PathVariable UUID id) {
-        return ResponseEntity.ok(expenseClaimService.approveClaim(id));
-    }
-
-    @PostMapping("/{id}/reject")
-    public ResponseEntity<ExpenseClaimResponse> rejectClaim(@PathVariable UUID id, @Valid @RequestBody RejectExpenseClaimRequest request) {
-        return ResponseEntity.ok(expenseClaimService.rejectClaim(id, request));
-    }
-
-    @PostMapping("/{id}/revise")
-    public ResponseEntity<ExpenseClaimResponse> reviseClaim(@PathVariable UUID id) {
-        return ResponseEntity.ok(expenseClaimService.reviseClaim(id));
-    }
-
-    @PostMapping("/{id}/pay")
-    public ResponseEntity<ExpenseClaimResponse> markClaimAsPaid(@PathVariable UUID id) {
-        return ResponseEntity.ok(expenseClaimService.markClaimAsPaid(id));
+    public ResponseEntity<ExpenseClaimResponse> updateClaim(@PathVariable UUID id, @Valid @RequestBody UpdateExpenseClaimRequest request, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(expenseClaimService.updateClaim(id, request, jwt.getSubject()));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteClaim(@PathVariable UUID id) {
         expenseClaimService.deleteClaim(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // ===============================================================================================================
+    // EMPLOYEE endpoints
+    // ===============================================================================================================
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PostMapping
+    public ResponseEntity<ExpenseClaimResponse> createClaim(@Valid @RequestBody CreateExpenseClaimRequest request, @AuthenticationPrincipal Jwt jwt) {
+        ExpenseClaimResponse response = expenseClaimService.createClaim(request, jwt.getSubject());
+        return ResponseEntity.status(HttpStatus.CREATED).body(response);
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping("/claims-by-employee")
+    public ResponseEntity<List<ExpenseClaimResponse>> getClaimsByEmployee_Id(@AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(expenseClaimService.getClaimsByEmployee_Id(jwt.getSubject()));
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @GetMapping("/claim-by-employee/{id}")
+    public ResponseEntity<ExpenseClaimResponse> getClaimByEmployee_Id(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(expenseClaimService.getClaimByEmployee_Id(id, jwt.getSubject()));
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PostMapping("/{id}/submit")
+    public ResponseEntity<ExpenseClaimResponse> submitClaim(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(expenseClaimService.submitClaim(id, jwt.getSubject()));
+    }
+
+    @PreAuthorize("hasRole('EMPLOYEE')")
+    @PostMapping("/{id}/revise")
+    public ResponseEntity<ExpenseClaimResponse> reviseClaim(@PathVariable UUID id, @AuthenticationPrincipal Jwt jwt) {
+        return ResponseEntity.ok(expenseClaimService.reviseClaim(id, jwt.getSubject()));
+    }
+
+    // ===============================================================================================================
+    // MANAGER endpoints
+    // ===============================================================================================================
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @PostMapping("/{id}/approve")
+    public ResponseEntity<ExpenseClaimResponse> approveClaim(@PathVariable UUID id) {
+        return ResponseEntity.ok(expenseClaimService.approveClaim(id));
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @PostMapping("/{id}/reject")
+    public ResponseEntity<ExpenseClaimResponse> rejectClaim(@PathVariable UUID id, @Valid @RequestBody RejectExpenseClaimRequest request) {
+        return ResponseEntity.ok(expenseClaimService.rejectClaim(id, request));
+    }
+
+    @PreAuthorize("hasRole('MANAGER')")
+    @GetMapping("/pending")
+    public ResponseEntity<List<ExpenseClaimResponse>> getPendingClaims() {
+        return ResponseEntity.ok(expenseClaimService.getPendingClaims());
+    }
+
+    // ===============================================================================================================
+    // FINANCE endpoints
+    // ===============================================================================================================
+
+    @PreAuthorize("hasRole('FINANCE')")
+    @PostMapping("/{id}/pay")
+    public ResponseEntity<ExpenseClaimResponse> markClaimAsPaid(@PathVariable UUID id) {
+        return ResponseEntity.ok(expenseClaimService.markClaimAsPaid(id));
+    }
+
+    @PreAuthorize("hasRole('FINANCE')")
+    @GetMapping("/approved")
+    public ResponseEntity<List<ExpenseClaimResponse>> getApprovedClaims() {
+        return ResponseEntity.ok(expenseClaimService.getApprovedClaims());
     }
 }

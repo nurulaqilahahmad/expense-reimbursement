@@ -14,6 +14,8 @@ public class ExpenseClaimResponse {
     private String description;
     private LocalDateTime submissionDate;
     private EnumExpenseClaimStatus status;
+    private UUID employeeId;
+    private String employeeUsername;
     private BigDecimal totalAmount;
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
@@ -61,6 +63,22 @@ public class ExpenseClaimResponse {
 
     public void setStatus(EnumExpenseClaimStatus status) {
         this.status = status;
+    }
+
+    public void setEmployeeId(UUID employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public UUID getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeUsername(String employeeUsername) {
+        this.employeeUsername = employeeUsername;
+    }
+
+    public String getEmployeeUsername() {
+        return employeeUsername;
     }
 
     public BigDecimal getTotalAmount() {

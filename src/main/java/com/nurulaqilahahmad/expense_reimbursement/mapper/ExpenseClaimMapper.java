@@ -53,6 +53,10 @@ public class ExpenseClaimMapper {
         response.setDescription(claim.getDescription());
         response.setSubmissionDate(claim.getSubmissionDate());
         response.setStatus(claim.getStatus());
+        if (claim.getEmployee() != null) {
+            response.setEmployeeId(claim.getEmployee().getId());
+            response.setEmployeeUsername(claim.getEmployee().getUsername());
+        }
         response.setTotalAmount(claim.getTotalAmount());
         response.setCreatedAt(claim.getCreatedAt());
         response.setUpdatedAt(claim.getUpdatedAt());
